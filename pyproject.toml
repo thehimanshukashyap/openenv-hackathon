@@ -35,8 +35,7 @@ packages = [
     "incident_response_env.server",
     "incident_response_env.server.scenarios",
 ]
-package-dir = {
-    "incident_response_env" = ".",
-    "incident_response_env.server" = "server",
-    "incident_response_env.server.scenarios" = "server/scenarios",
-}
+[tool.setuptools.package-dir]
+"incident_response_env" = "."
+"incident_response_env.server" = "server"
+"incident_response_env.server.scenarios" = "server/scenarios"
