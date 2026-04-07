@@ -1,0 +1,34 @@
+spec_version: 1
+name: incident-response-env
+type: space
+runtime: fastapi
+app: server.app:app
+port: 7860
+
+description: >
+  RL environment simulating real-world IT incident response.
+  An AI agent investigates system alerts, queries logs and metrics,
+  identifies root causes, and applies correct mitigations.
+  Three difficulty levels: easy (single service), medium (cascading failure),
+  hard (intermittent race condition).
+
+tasks:
+  - name: easy
+    description: Single service failure with obvious root cause
+    max_steps: 10
+    reward_range: [0.0, 1.0]
+  - name: medium
+    description: Cascading microservice failure requiring dependency tracing
+    max_steps: 18
+    reward_range: [0.0, 1.0]
+  - name: hard
+    description: Intermittent race condition with misleading signals
+    max_steps: 25
+    reward_range: [0.0, 1.0]
+
+tags:
+  - openenv
+  - incident-response
+  - sre
+  - devops
+  - reinforcement-learning
