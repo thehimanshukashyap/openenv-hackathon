@@ -14,14 +14,19 @@ Or:
 """
 
 import os
+import sys
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import Optional
 
 try:
     from server.environment import IncidentResponseEnvironment
 except ImportError:
     from environment import IncidentResponseEnvironment
+
+try:
+    from models import IncidentAction, IncidentObservation, IncidentState
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from models import IncidentAction, IncidentObservation, IncidentState
 
 
 app = FastAPI(
@@ -49,36 +54,24 @@ def _get_env(task_name: str) -> IncidentResponseEnvironment:
     return _envs[task_name]
 
 
-# ── Request model ─────────────────────────────────────────────────────────────
-
-class ActionRequest(BaseModel):
-    action_type: str
-    target_service: Optional[str] = None
-    log_level: Optional[str] = None
-    suspected_service: Optional[str] = None
-    suspected_cause: Optional[str] = None
-    mitigation: Optional[str] = None
-    task_name: str = "easy"
-
-
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
-@app.post("/reset")
-def reset(task_name: str = "easy"):
+@app.post("/reset", response_model=IncidentObservation)
+def reset(task_name: str = "easy") -> IncidentObservation:
     """Reset the environment and start a new episode for the given task."""
     env = _get_env(task_name)
     return env.reset()
 
 
-@app.post("/step")
-def step(request: ActionRequest):
+@app.post("/step", response_model=IncidentObservation)
+def step(request: IncidentAction) -> IncidentObservation:
     """Execute one action in the current episode."""
     env = _get_env(request.task_name)
     return env.step(request.model_dump())
 
 
-@app.get("/state")
-def state(task_name: str = "easy"):
+@app.get("/state", response_model=IncidentState)
+def state(task_name: str = "easy") -> IncidentState:
     """Return the current episode state and running score."""
     env = _get_env(task_name)
     return env.state()
